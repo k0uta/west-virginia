@@ -6,36 +6,34 @@ public class PlayerBehavior : MonoBehaviour
 {
     public float movementSpeed = 10;
     public float turningSpeed = 60;
-
+    Animator playerStateMachine;
+    float speed;
+    float defaultSpeed = 15.0f;
+    float dashingSpeed = 50.0f;
+    AnimatorStateInfo currentAnimatorStateInfo;
     AudioSource playerAudio;
 
     // Use this for initialization
     void Start()
     {
         playerAudio = GetComponent<AudioSource>();
+        speed = defaultSpeed;
+        playerStateMachine = GetComponent<Animator>();
     }
 
-    // Updates player color
-    void UpdatePlayerColor()
+    bool IsDashing()
     {
-        Renderer renderer = GetComponent<Renderer>();
-        if (Input.GetKey(KeyCode.Space))
-        {
-            renderer.material.color = Color.yellow;
-        }
-        else
-        {
-            renderer.material.color = Color.green;
-        }
+        return currentAnimatorStateInfo.IsName("Dashing");
     }
 
     void HandlePlayerTranslation()
     {
-        var z = Input.GetAxis("Vertical") * Time.deltaTime * 15.0f;
-        transform.Translate(0, 0, z);
+        var z = Input.GetAxis("Vertical") * Time.deltaTime * speed;
+        // transform.Translate(0, 0, z);
 
         if (Mathf.Abs(z) >= 0.001f)
         {
+            transform.Translate(transform.forward * Time.deltaTime * speed);
             playerAudio.UnPause();
         }
         else
@@ -63,26 +61,48 @@ public class PlayerBehavior : MonoBehaviour
 
         transform.rotation = Quaternion.Euler(0, -angle, 0);
     }
+
+    void HandleDashInput()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && !IsDashing())
+        {
+            playerStateMachine.SetTrigger("Dash");
+        }
+    }
     //Handles Player Inputs
     void HandleInputs()
     {
-        HandlePlayerRotation();
+        if (!IsDashing())
+        {
+            HandlePlayerRotation();
 
-        HandlePlayerTranslation();
+            HandlePlayerTranslation();
+
+            HandleDashInput();
+        }
     }
 
-    void HandleAudio()
-    {
+    // void HandleDash()
+    // {
+    //     if (IsDashing())
+    //     {
+    //         speed = dashingSpeed;
+    //     }
+    //     else
+    //     {
 
-    }
+    //         speed = defaultSpeed;
+    //     }
+    // }
 
     // Update is called once per frame
     void Update()
     {
-        UpdatePlayerColor();
+        currentAnimatorStateInfo = playerStateMachine.GetCurrentAnimatorStateInfo(0);
 
         HandleInputs();
 
-        HandleAudio();
+        Debug.DrawRay(transform.position, transform.TransformDirection(transform.forward) * 10, Color.blue);
+        // HandleDash();
     }
 }
