@@ -5,12 +5,14 @@ using UnityEngine;
 public class PlayerDash : StateMachineBehaviour
 {
 
+    [SerializeField]
+    float dashSpeed = 80.0f;
+
+
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         GameObject playerGameObject = animator.gameObject;
-        Rigidbody playerRigidbody = playerGameObject.GetComponent<Rigidbody>();
-        playerRigidbody.isKinematic = true;
 
         Renderer renderer = playerGameObject.GetComponent<Renderer>();
         renderer.material.color = Color.yellow;
@@ -19,9 +21,11 @@ public class PlayerDash : StateMachineBehaviour
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
+        CharacterController characterController = animator.gameObject.GetComponent<CharacterController>();
         Transform playerTransform = animator.gameObject.transform;
 
-        playerTransform.Translate(playerTransform.forward * Time.deltaTime * 80.0f);
+        Vector3 forwardMove = playerTransform.TransformDirection(Vector3.forward) * Time.deltaTime * dashSpeed;
+        characterController.Move(forwardMove);
 
     }
 
@@ -29,9 +33,6 @@ public class PlayerDash : StateMachineBehaviour
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         GameObject playerGameObject = animator.gameObject;
-        Rigidbody playerRigidbody = playerGameObject.GetComponent<Rigidbody>();
-        playerRigidbody.isKinematic = false;
-
         Renderer renderer = playerGameObject.GetComponent<Renderer>();
         renderer.material.color = Color.white;
     }

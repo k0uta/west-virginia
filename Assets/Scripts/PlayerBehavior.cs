@@ -4,21 +4,18 @@ using UnityEngine;
 
 public class PlayerBehavior : MonoBehaviour
 {
-    public float movementSpeed = 10;
-    public float turningSpeed = 60;
     Animator playerStateMachine;
-    float speed;
-    float defaultSpeed = 15.0f;
-    float dashingSpeed = 50.0f;
     AnimatorStateInfo currentAnimatorStateInfo;
     AudioSource playerAudio;
+    CharacterController characterController;
+    float speed = 15.0f;
 
     // Use this for initialization
     void Start()
     {
         playerAudio = GetComponent<AudioSource>();
-        speed = defaultSpeed;
         playerStateMachine = GetComponent<Animator>();
+        characterController = GetComponent<CharacterController>();
     }
 
     bool IsDashing()
@@ -28,12 +25,11 @@ public class PlayerBehavior : MonoBehaviour
 
     void HandlePlayerTranslation()
     {
-        var z = Input.GetAxis("Vertical") * Time.deltaTime * speed;
-        // transform.Translate(0, 0, z);
+        Vector3 forwardMove = Input.GetAxis("Vertical") * transform.TransformDirection(Vector3.forward) * speed * Time.deltaTime;
+        characterController.Move(forwardMove);
 
-        if (Mathf.Abs(z) >= 0.001f)
+        if (Mathf.Abs(forwardMove.magnitude) >= 0.001f)
         {
-            transform.Translate(transform.forward * Time.deltaTime * speed);
             playerAudio.UnPause();
         }
         else
@@ -41,6 +37,7 @@ public class PlayerBehavior : MonoBehaviour
             playerAudio.Pause();
         }
     }
+
     void HandlePlayerRotation()
     {
         Vector3 mousePos = Input.mousePosition;
@@ -49,8 +46,6 @@ public class PlayerBehavior : MonoBehaviour
         mousePos.x -= Screen.width / 2;
         mousePos.y -= Screen.height / 2;
 
-        //To make mousePos relative to transform
-        mousePos += transform.position;
         var angle = Vector3.Angle(mousePos, Vector3.up);
 
         //For 360 degree angle
@@ -69,6 +64,12 @@ public class PlayerBehavior : MonoBehaviour
             playerStateMachine.SetTrigger("Dash");
         }
     }
+
+    void HandlePhysics()
+    {
+        characterController.SimpleMove(Physics.gravity);
+    }
+
     //Handles Player Inputs
     void HandleInputs()
     {
@@ -79,21 +80,10 @@ public class PlayerBehavior : MonoBehaviour
             HandlePlayerTranslation();
 
             HandleDashInput();
+
+            HandlePhysics();
         }
     }
-
-    // void HandleDash()
-    // {
-    //     if (IsDashing())
-    //     {
-    //         speed = dashingSpeed;
-    //     }
-    //     else
-    //     {
-
-    //         speed = defaultSpeed;
-    //     }
-    // }
 
     // Update is called once per frame
     void Update()
@@ -102,7 +92,6 @@ public class PlayerBehavior : MonoBehaviour
 
         HandleInputs();
 
-        Debug.DrawRay(transform.position, transform.TransformDirection(transform.forward) * 10, Color.blue);
-        // HandleDash();
+        Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 10, Color.blue);
     }
 }
