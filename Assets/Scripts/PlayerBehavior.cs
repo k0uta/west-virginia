@@ -92,6 +92,14 @@ public class PlayerBehavior : MonoBehaviour
 
         HandleInputs();
 
+    }
+
+    /// <summary>
+    /// LateUpdate is called every frame, if the Behaviour is enabled.
+    /// It is called after all Update functions have been called.
+    /// </summary>
+    void LateUpdate()
+    {
         Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 10, Color.blue);
     }
 }
