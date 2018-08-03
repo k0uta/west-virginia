@@ -86,32 +86,15 @@ public class PlayerBehavior : MonoBehaviour
     }
 
     /// <summary>
-    /// OnControllerColliderHit is called when the controller hits a
-    /// collider while performing a Move.
-    /// </summary>
-    /// <param name="hit">The ControllerColliderHit data associated with this collision.</param>
-    void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        // var other = hit;
-        // Debug.Log("OnControllerColliderHit " + other.gameObject.tag);
-        // if (other.gameObject.tag == "Wall" && IsDashing())
-        // {
-        //     Physics.IgnoreCollision(characterController, other.collider);
-        //     Physics.IgnoreCollision(characterController, other.collider, false);
-        // }
-
-    }
-
-    /// <summary>
     /// OnTriggerEnter is called when the Collider other enters the trigger.
     /// </summary>
     /// <param name="other">The other Collider involved in this collision.</param>
     void OnTriggerEnter(Collider other)
     {
-        Debug.Log("ontrigger enter");
-        if (other.gameObject.tag == "Wall" && IsDashing())
+        var interaction = other.gameObject.GetComponent<IInteraction>();
+        if (interaction != null)
         {
-            Physics.IgnoreCollision(characterController, other);
+            interaction.StartInteraction(gameObject, IsDashing());
         }
     }
     /// <summary>
@@ -121,10 +104,10 @@ public class PlayerBehavior : MonoBehaviour
     /// <param name="other">The other Collider involved in this collision.</param>
     void OnTriggerStay(Collider other)
     {
-        Debug.Log("ontrigger enter");
-        if (other.gameObject.tag == "Wall" && IsDashing())
+        var interaction = other.gameObject.GetComponent<IInteraction>();
+        if (interaction != null)
         {
-            Physics.IgnoreCollision(characterController, other);
+            interaction.UpdateInteraction(gameObject, IsDashing());
         }
     }
     /// <summary>
@@ -133,10 +116,10 @@ public class PlayerBehavior : MonoBehaviour
     /// <param name="other">The other Collider involved in this collision.</param>
     void OnTriggerExit(Collider other)
     {
-        Debug.Log("ontrigger exit");
-        if (other.gameObject.tag == "Wall" && IsDashing())
+        var interaction = other.gameObject.GetComponent<IInteraction>();
+        if (interaction != null)
         {
-            Physics.IgnoreCollision(characterController, other, false);
+            interaction.FinishInteraction(gameObject, IsDashing());
         }
     }
     // Update is called once per frame
