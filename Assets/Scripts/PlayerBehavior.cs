@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerBehavior : MonoBehaviour
 {
@@ -122,6 +123,12 @@ public class PlayerBehavior : MonoBehaviour
             interaction.FinishInteraction(gameObject, IsDashing());
         }
     }
+
+    public void Hit()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
     // Update is called once per frame
     void Update()
     {

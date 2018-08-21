@@ -17,8 +17,6 @@ public class CameraScript : MonoBehaviour
     {
         Vector3 currentPlayerPos = player.transform.position;
 
-        float angleDelta = player.transform.eulerAngles.y - transform.eulerAngles.y;
-
         // Set the position of the camera's transform to be the same as the player's, but offset by the calculated offset distance.
         transform.position = currentPlayerPos;
 
